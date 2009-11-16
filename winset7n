@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#cd /home/okusako/prog/carmen/carmen.0.4.6.i/bin
+#cd /usr/local/carmen_new/bin
+#cd /home/2009/niitomo/carmen/carmen.0.4.6.i/bin
+#cd /home/2009/hanada/carmen074/bin
+#cd /home/sakane/carmen074/bin
+
+#cd /home/2009/niitomo/carmen/carmen-old/bin
+
+#cd /home/2009/niitomo/gmapping-dist/software/carmen.0.4.6.i/bin
+#cd /home/2009/niitomo/project/gmapping-dist/
+xterm -bg white  -geometry 75x7+5+30   &
+xterm -bg white  -geometry 75x7+5+160 &
+xterm -bg white  -geometry 75x7+5+290 &
+xterm -bg white  -geometry 75x7+5+420 &
+
+
+#xterm -bg white  -geometry 75x10+0+0   &
+#xterm -bg white  -geometry 75x10+0+180 &
+#xterm -bg white  -geometry 75x10+0+360 &
+#xterm -bg white  -geometry 75x10+0+540 &
+
+#if [ $# -ne 0 ]
+#then
+#    xterm -bg white -geometry 75x10+555+540 &
+#    xterm -bg white -geometry 75x10+555+360 &
+#    xterm -bg white -geometry 75x10+555+180 &
+
+xterm -bg white -geometry 75x7+560+30 &
+xterm -bg white -geometry 75x7+560+160 &
+xterm -bg white -geometry 75x7+560+290 &
+
+#fi
+

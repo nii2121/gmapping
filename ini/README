@@ -1,0 +1,6 @@
+This directory contains some init-files for different configurations,
+like SICK LMS or SICK PLS laser range finder, or for maps with
+different resolutions.
+
+Most of the logs should be corrected with these standard setting,
+however, some logs need further optimization. 

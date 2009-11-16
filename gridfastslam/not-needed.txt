@@ -1,0 +1,6 @@
+
+regScore
+critScore
+maxMove
+entropyDelta
+

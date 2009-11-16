@@ -1,0 +1,104 @@
+# Makefile generico per shared object
+
+export VERBOSE
+
+ifeq ($(PROFILE),true)
+ LD_APP_STARTUP= /usr/lib/gcrt1.o
+ CXXFLAGS+= -pg
+endif
+
+# Nome del package
+PACKAGE=$(notdir $(shell pwd))
+# Libreria da generare:
+# Se non si setta la variabile LIBNAME la libreria si chiama
+# come la directory
+ifndef LIBNAME
+LIBNAME=$(PACKAGE)
+endif
+
+SONAME=$(LIBDIR)/lib$(LIBNAME).so
+APPLICATIONS= $(foreach a, $(APPS),$(BINDIR)/$(a))
+UI_INCLUDES = $(foreach module,$(basename $(UIOBJS)),$(module).h)
+UI_CPP      = $(foreach module,$(basename $(UIOBJS)),$(module).cpp)
+
+all: $(SONAME) $(APPLICATIONS)
+
+.SECONDARY: $(OBJS) $(COBJS) $(UIOBJS)
+.PHONY:     all clean copy doc
+
+# Generazione della libreria
+$(SONAME): $(OBJS) $(COBJS) $(UIOBJS)
+	@$(MESSAGE) "lib$(LIBNAME).so"
+	@$(PRETTY) "$(CXX) $(LDFLAGS) -fPIC -shared -L$(LIBDIR) $(LIBS) $(OBJS) $(COBJS) $(UIOBJS) -o $@"
+	@if ! $(PRETTY) "$(TESTLIB) $(SONAME)"; then $(MESSAGE) "Testing of $(SONAME) failed.";  exit 1; fi;
+
+#	@if ! $(PRETTY) "$(TESTLIB) $(SONAME)"; then $(MESSAGE) "Testing of $(SONAME) failed."; rm $(SONAME); exit 1; fi;
+
+# Generazione delle applicazioni
+$(BINDIR)/%: %.cpp $(SONAME)
+	@$(MESSAGE) "$@"
+	@$(PRETTY) "$(CXX) $(CPPFLAGS) $(CXXFLAGS) -L$(LIBDIR) $(LIBS)	-l$(LIBNAME) $< -o $@ $(LD_APP_STARTUP)"
+#Regole per la generazione di tabelle o altri file creati automaticamente
+moc_%.cpp: %.h
+	@$(MESSAGE) "$@ (.h -> moc_.cpp)"
+	@$(PRETTY) "$(MOC) -o $@ $<"
+
+%.h:	%.ui
+	@$(MESSAGE) "$@ (.ui -> .h)"
+	@$(PRETTY) "$(UIC) -nofwd -o $@ $< "
+
+%.cpp:	%.h %.ui 
+	@$(MESSAGE) "$@ (.ui, .h -> .cpp)"
+	@$(PRETTY) "$(UIC) -nofwd  -impl $^ -o $@"
+
+# Generazione degli oggetti
+%.o: %.cpp
+	@$(MESSAGE) "$@ (.cpp -> .o)"
+	@$(PRETTY) "$(CXX) -fPIC $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@"
+
+%.o: %.c
+	@$(MESSAGE) "$@ (.c -> .o)"
+	@$(PRETTY) "$(CC) -fPIC $(CPPFLAGS) $(CFLAGS) -c $< -o $@"
+
+#Regole per la generazione delle dipendenze
+OBJDEPS   = $(foreach module,$(basename $(OBJS)),$(module).d)
+COBJDEPS  = $(foreach module,$(basename $(COBJS)),$(module).d)
+UIOBJDEPS = $(foreach module,$(basename $(UIOBJS)),$(module).d)
+
+
+$(OBJDEPS): %.d: %.cpp
+	@$(MESSAGE) "$@"
+	@$(PRETTY) "$(CXX) $(CPPFLAGS) -MM -MG $< -MF $@"
+
+$(COBJDEPS): %.d: %.c
+	@$(MESSAGE) "$@"
+	@$(PRETTY) "$(CC)  $(CPPFLAGS) -MM -MG $< -MF $@"
+
+$(UIOBJDEPS): %.d: %.cpp
+	@$(MESSAGE) "$@"
+	@$(PRETTY) "$(CC)  $(CPPFLAGS) -MM -MG $< -MF $@"
+
+	
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),copy)
+-include $(OBJDEPS) $(COBJDEPS) $(UIOBJDEPS)
+endif
+endif
+
+
+#doc:
+#	rm -rf doc/$(PACKAGE)
+#ifeq ($(strip $(DOCTITLE)),)
+#	kdoc -L doc -d doc/$(PACKAGE) -n "Package $(PACKAGE) (lib$(PACKAGE).so)" $(HEADERS)
+#else
+#	kdoc -L doc -d doc/$(PACKAGE) -n "$(DOCTITLE) (lib$(PACKAGE).so)" $(HEADERS)
+#endif
+
+clean:
+	@$(MESSAGE) "Cleaning $(PACKAGE)"
+	@$(PRETTY) "rm -f $(SONAME) $(APPLICATIONS)"
+	@$(PRETTY) "rm -f *.o *.d core *~ table_*.cpp gen_table*[^.][^c][^p][^p] moc_*.cpp *.ui.h"
+	@$(PRETTY) "rm -f $(UI_INCLUDES)  $(UI_CPP)"
+
+copy:	clean
+	tar -C .. -cvzf `date +../$(PACKAGE)-%d%b%y.tgz` $(PACKAGE)
