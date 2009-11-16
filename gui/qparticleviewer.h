@@ -36,7 +36,8 @@
 #include <qimage.h>
 #include <utils/point.h>
 #include "gsp_thread.h"
-
+#include <qrangecontrol.h>
+#include <qpoint.h>
 
 
 
@@ -75,6 +76,17 @@ class QParticleViewer :  public QWidget{
     unsigned int iterations;
   };
 
+  //coordinate transformation
+  // struct AbsoluteCoordinate{
+  //switch
+  int absswitch;
+  //origin-point
+  double orig_x,orig_y;
+  //x-axis-point
+  double xaxis_x,xaxis_y;
+  //y-axis-point
+  double yaxis_x,yaxis_y;
+  //  };
   void refreshParameters(); //reads the parameters from the thread
   inline void setGSP( GridSlamProcessorThread* thread){gfs_thread=thread;}
 		
@@ -95,20 +107,23 @@ class QParticleViewer :  public QWidget{
   StartParameters startParameters;
 		
   int writeToFile;
-  //set absolute coordinates
-
   public slots:
   void setMatchingParameters(const MatchingParameters& mp);
   void setStartParameters(const StartParameters& mp);
   void start();
   void stop();
   void loadFile(const char *);
+  void received( int, int );
+  void getabsolute(int,int);
+
  signals:
   void neffChanged(double);
   void poseEntropyChanged(double, double, double);
   void trajectoryEntropyChanged(double, double, double);
   void mapsEntropyChanged(double);
   void mapsIGainChanged(double);
+  void valueChanged( int, int );
+
 		
  protected:
   ifstream inputStream;
@@ -137,17 +152,6 @@ class QParticleViewer :  public QWidget{
   QPoint draggingPos;
   bool dragging;
 		
-  //coordinate transformation
-  //switch
-  int absswitch;
-  //origin-point
-  QPoint *absorigin;
-  //x-axis-point
-  QPoint *absx_axis;
-  //y-axis-point
-  QPoint *absy_axis;
-
-
   //particle plotting
   virtual void keyPressEvent ( QKeyEvent* e );
 		

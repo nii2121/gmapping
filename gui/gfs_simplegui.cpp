@@ -29,18 +29,14 @@
 #include <qlayout.h>
 #include <qvbox.h>
 #include <qmainwindow.h>
-//#include "qtscribble.h"
 
 class GFSMainWindow: public QMainWindow{
 public:
   GFSMainWindow(GridSlamProcessorThread* t){
-    cout << "####GFSMainWindow start####" <<endl;
     gsp_thread=t;
     QVBoxLayout* layout=new QVBoxLayout(this);
-    cout << "### pviewer in  ###" <<endl;
     pviewer=new QParticleViewer(this,0,0,gsp_thread);
-    cout << "### pviewer out ###" <<endl;
-    pviewer->setGeometry(0,0,1000,1000);
+    pviewer->setGeometry(0,0,500,500);
     pviewer->setFocusPolicy(QParticleViewer::ClickFocus);
     layout->addWidget(pviewer);
 						
@@ -59,9 +55,7 @@ public:
   }
 		
   void start(int c){
-    cerr << "###pviewer open###" <<endl;
     pviewer->start(c);
-    cerr << "###gpainter open ###" << endl;
     gpainter->start(c);
   }
 
@@ -77,10 +71,8 @@ protected:
 int  main (int argc, char ** argv){
   cerr << "GMAPPING copyright 2004 by Giorgio Grisetti, Cyrill Stachniss," << endl ;
   cerr << "and Wolfram Burgard. To be published under the CreativeCommons license," << endl;
-  cerr << "see: http://creativecommons.org/licenses/by-nc-sa/2.0/" << endl;
-
-  cerr << endl << "gfs_simplegui start!! " << endl << endl;
-
+  cerr << "see: http://creativecommons.org/licenses/by-nc-sa/2.0/" << endl << endl;
+  cerr << "gfs_simplegui start" << endl; 
   GridSlamProcessorThread* gsp=  new GridSlamProcessorThread;
   if (gsp->init(argc, argv)){
     cerr << "GridFastSlam: Initialization Error!" << endl;
@@ -93,16 +85,12 @@ int  main (int argc, char ** argv){
   }
   cerr <<"File successfully loaded!"<< endl;
   QApplication app(argc, argv);
-
   GFSMainWindow* mainWin=new GFSMainWindow(gsp);
   app.setMainWidget(mainWin);
   mainWin->show();
   gsp->setEventBufferSize(10000);
   gsp->start();
   mainWin->start(1000);
-  cerr <<"####Application start####" << endl;
-  app.exec();
-  cerr <<"####Application end  ####" << endl;
-  return 0;
+  return app.exec();
 }
 

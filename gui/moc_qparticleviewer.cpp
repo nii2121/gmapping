@@ -1,7 +1,7 @@
 /****************************************************************************
 ** QParticleViewer meta object code from reading C++ file 'qparticleviewer.h'
 **
-** Created: Mon Nov 16 20:39:32 2009
+** Created: Mon Nov 16 10:33:05 2009
 **      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.6   edited Mar 8 17:43 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -66,12 +66,24 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ 0, &static_QUType_charstar, 0, QUParameter::In }
     };
     static const QUMethod slot_4 = {"loadFile", 1, param_slot_4 };
+    static const QUParameter param_slot_5[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In },
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod slot_5 = {"received", 2, param_slot_5 };
+    static const QUParameter param_slot_6[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In },
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod slot_6 = {"getabsolute", 2, param_slot_6 };
     static const QMetaData slot_tbl[] = {
 	{ "setMatchingParameters(const MatchingParameters&)", &slot_0, QMetaData::Public },
 	{ "setStartParameters(const StartParameters&)", &slot_1, QMetaData::Public },
 	{ "start()", &slot_2, QMetaData::Public },
 	{ "stop()", &slot_3, QMetaData::Public },
-	{ "loadFile(const char*)", &slot_4, QMetaData::Public }
+	{ "loadFile(const char*)", &slot_4, QMetaData::Public },
+	{ "received(int,int)", &slot_5, QMetaData::Public },
+	{ "getabsolute(int,int)", &slot_6, QMetaData::Public }
     };
     static const QUParameter param_signal_0[] = {
 	{ 0, &static_QUType_double, 0, QUParameter::In }
@@ -97,17 +109,23 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ 0, &static_QUType_double, 0, QUParameter::In }
     };
     static const QUMethod signal_4 = {"mapsIGainChanged", 1, param_signal_4 };
+    static const QUParameter param_signal_5[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In },
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod signal_5 = {"valueChanged", 2, param_signal_5 };
     static const QMetaData signal_tbl[] = {
 	{ "neffChanged(double)", &signal_0, QMetaData::Public },
 	{ "poseEntropyChanged(double,double,double)", &signal_1, QMetaData::Public },
 	{ "trajectoryEntropyChanged(double,double,double)", &signal_2, QMetaData::Public },
 	{ "mapsEntropyChanged(double)", &signal_3, QMetaData::Public },
-	{ "mapsIGainChanged(double)", &signal_4, QMetaData::Public }
+	{ "mapsIGainChanged(double)", &signal_4, QMetaData::Public },
+	{ "valueChanged(int,int)", &signal_5, QMetaData::Public }
     };
     metaObj = QMetaObject::new_metaobject(
 	"QParticleViewer", parentObject,
-	slot_tbl, 5,
-	signal_tbl, 5,
+	slot_tbl, 7,
+	signal_tbl, 6,
 #ifndef QT_NO_PROPERTIES
 	0, 0,
 	0, 0,
@@ -175,6 +193,20 @@ void QParticleViewer::mapsIGainChanged( double t0 )
     activate_signal( staticMetaObject()->signalOffset() + 4, t0 );
 }
 
+// SIGNAL valueChanged
+void QParticleViewer::valueChanged( int t0, int t1 )
+{
+    if ( signalsBlocked() )
+	return;
+    QConnectionList *clist = receivers( staticMetaObject()->signalOffset() + 5 );
+    if ( !clist )
+	return;
+    QUObject o[3];
+    static_QUType_int.set(o+1,t0);
+    static_QUType_int.set(o+2,t1);
+    activate_signal( clist, o );
+}
+
 bool QParticleViewer::qt_invoke( int _id, QUObject* _o )
 {
     switch ( _id - staticMetaObject()->slotOffset() ) {
@@ -183,6 +215,8 @@ bool QParticleViewer::qt_invoke( int _id, QUObject* _o )
     case 2: start(); break;
     case 3: stop(); break;
     case 4: loadFile((const char*)static_QUType_charstar.get(_o+1)); break;
+    case 5: received((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
+    case 6: getabsolute((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
     default:
 	return QWidget::qt_invoke( _id, _o );
     }
@@ -197,6 +231,7 @@ bool QParticleViewer::qt_emit( int _id, QUObject* _o )
     case 2: trajectoryEntropyChanged((double)static_QUType_double.get(_o+1),(double)static_QUType_double.get(_o+2),(double)static_QUType_double.get(_o+3)); break;
     case 3: mapsEntropyChanged((double)static_QUType_double.get(_o+1)); break;
     case 4: mapsIGainChanged((double)static_QUType_double.get(_o+1)); break;
+    case 5: valueChanged((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
     default:
 	return QWidget::qt_emit(_id,_o);
     }
