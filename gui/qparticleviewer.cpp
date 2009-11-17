@@ -26,6 +26,7 @@
 #include <qimage.h>
 //#include "qkcoordsel.h"
 #include <qpainter.h>
+#include <math.h>
 using namespace std;
 
 //Constructor
@@ -155,6 +156,8 @@ void QParticleViewer::keyPressEvent ( QKeyEvent *e ){
     viewCenter.x=0;
     viewCenter.y=0;
     update();break;
+  case Qt::Key_D:
+    cout <<"arctan:"<<turnangle<<endl;break;
 
   default:;
   }
@@ -533,7 +536,14 @@ void  QParticleViewer::received( int x, int y )
 void QParticleViewer::getabsolute(int x,int y)
 {
 
-  if(!orig_x && !orig_y)
+
+  if(!yaxis_x && !yaxis_y)
+    {
+      yaxis_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
+      yaxis_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;    
+      cout << "y_axis:(" <<yaxis_x<<","<<yaxis_y<<")"<< endl;
+    }
+  else if(!orig_x && !orig_y)
     {
       orig_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
       orig_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;
@@ -542,20 +552,18 @@ void QParticleViewer::getabsolute(int x,int y)
 
   else if(!xaxis_x && !xaxis_y)
     {
-      xaxis_x=x;
-      xaxis_y=y;
+
+      xaxis_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
+      xaxis_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;
       cout << "x_axis:(" <<xaxis_x<<","<<xaxis_y<<")"<<endl;
     }
-  else if(!yaxis_x && !yaxis_y)
-    {
-      yaxis_x=x;
-      yaxis_y=y;
-      cout << "y_axis:(" <<yaxis_x<<","<<yaxis_y<<")"<< endl;
-	}
+
+    
   else
     {
       cout << "#### got 3 points ####" <<endl;
       absswitch=0;
+      turnangle=atan2(yaxis_y - orig_y,yaxis_x - orig_x);
       cout <<"### absswitch OFF ###" << endl;
     }
 }
