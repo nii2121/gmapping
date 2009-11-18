@@ -47,21 +47,11 @@ QParticleViewer::QParticleViewer( QWidget * parent, const char * name , WFlags f
   count=0;
   writeToFile=0;
 
-  //switch
-  absswitch=0;
-  //origin-point
-  orig_x=0;
-  orig_y=0;
-  //x-axis-point
-  xaxis_x=0;
-  xaxis_y=0;
-  //y-axis-point
-  yaxis_x=0;
-  yaxis_y=0;
-
+  abs_origin = new Point();
+  abs_xaxis = new Point();
+  abs_yaxis = new Point();
   connect(this,SIGNAL(valueChanged(int,int)),
 	  this,SLOT(getabsolute(int,int)));
-
 
 }
 
@@ -94,14 +84,14 @@ void QParticleViewer::paintEvent ( QPaintEvent *paintevent ){
 void QParticleViewer::mousePressEvent ( QMouseEvent *event ){
   if (event->button()==LeftButton){
     dragging=true;
-    draggingPos=event->pos();	
+    clickPos=event->pos();	
   }
 
   /*　クリックで座標指定	*/
   if (event->button()==RightButton){
     if (absswitch){
-      draggingPos=event->pos();
-      emit valueChanged( draggingPos.x(), draggingPos.y() );
+      clickPos=event->pos();
+      emit valueChanged( clickPos.x(), clickPos.y() );
     }
   }
 }
@@ -110,9 +100,9 @@ void QParticleViewer::mousePressEvent ( QMouseEvent *event ){
   void QParticleViewer::mouseMoveEvent ( QMouseEvent *event ){
     cout << "-- mouseMoveEvent --"<<endl;
     if (dragging){
-      cout <<"click:("<< draggingPos.x() <<"," << draggingPos.y() << ") --> " << "(" << event->x() <<","<<event->y()<<")"<<endl;
-      QPoint delta=event->pos()-draggingPos;
-      draggingPos=event->pos();
+      cout <<"click:("<< clickPos.x() <<"," << clickPos.y() << ") --> " << "(" << event->x() <<","<<event->y()<<")"<<endl;
+      QPoint delta=event->pos()-clickPos;
+      clickPos=event->pos();
       cout <<"viewCenter:("<<viewCenter.x<<","<<viewCenter.y<<") --> ";
       viewCenter.x-=delta.x()/mapscale;
       viewCenter.y+=delta.y()/mapscale;
@@ -138,23 +128,18 @@ void QParticleViewer::keyPressEvent ( QKeyEvent *e ){
 
   case Qt::Key_A: absswitch=1;cout <<"### absswitch ON ###" << endl; break;
   case Qt::Key_Z: absswitch=0;cout <<"### absswitch OFF###" << endl;
-    orig_x=0;orig_y=0;
-    xaxis_x=0;xaxis_y=0;
-    yaxis_x=0;yaxis_y=0;
+    *abs_origin=Point(0,0);
+    *abs_xaxis=Point(0,0);
+    *abs_yaxis=Point(0,0);
     cout << "### reset absolute point ###" << endl; break;
-  case Qt::Key_S: cout << "origin:(" <<orig_x<<","<<orig_y <<")\n"
-		       << "x_axis:(" <<xaxis_x<<","<<xaxis_y<<")\n"
-		       << "y_axis:(" <<yaxis_x<<","<<yaxis_y<<")"<< endl;break;
-  case Qt::Key_V: cout << "viewCenter:("<<viewCenter.x<<","<<viewCenter.y<<")\n"
+  case Qt::Key_S: cout << "viewCenter:("<<viewCenter.x<<","<<viewCenter.y<<")\n"
 		       << "mapscale  :("<<mapscale <<")\n"
 		       << "m_pixmap  :("<<m_pixmap->size().width()<<","<<m_pixmap->size().height()<<")\n"<<endl;break;
   case Qt::Key_X:
-    viewCenter.x=orig_x;
-    viewCenter.y=orig_y;
+    viewCenter=*abs_origin;
     update();break;
   case Qt::Key_E:
-    viewCenter.x=0;
-    viewCenter.y=0;
+    viewCenter=Point(0,0);
     update();break;
   case Qt::Key_D:
     cout <<"arctan:"<<turnangle<<endl;break;
@@ -535,36 +520,35 @@ void  QParticleViewer::received( int x, int y )
 
 void QParticleViewer::getabsolute(int x,int y)
 {
-
-
-  if(!yaxis_x && !yaxis_y)
-    {
-      yaxis_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
-      yaxis_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;    
-      cout << "y_axis:(" <<yaxis_x<<","<<yaxis_y<<")"<< endl;
+  if(!abs_yaxis->x && !abs_yaxis->y)
+    { 
+      *abs_yaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+		       viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      cout << "y_axis:(" <<abs_yaxis->x<<","<<abs_yaxis->y<<")"<< endl;
     }
-  else if(!orig_x && !orig_y)
+  else if(!abs_origin->x && !abs_origin->y)
     {
-      orig_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
-      orig_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;
-      cout << "origin:(" <<orig_x<<","<<orig_y <<")"<<endl;
+      *abs_origin=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+			viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      cout << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y <<")"<<endl;
     }
-
-  else if(!xaxis_x && !xaxis_y)
+  else if(!abs_xaxis->x && !abs_xaxis->y)
     {
-
-      xaxis_x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
-      xaxis_y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;
-      cout << "x_axis:(" <<xaxis_x<<","<<xaxis_y<<")"<<endl;
-    }
-
-    
+      *abs_xaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+		       viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      //      abs_xaxis->x=viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale;
+      //      abs_xaxis->y=viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale;
+      cout << "x_axis:(" <<abs_xaxis->x<<","<<abs_xaxis->y<<")"<<endl;
+    }   
   else
     {
       cout << "#### got 3 points ####" <<endl;
+      cout << "abs_y_axis:(" <<abs_yaxis->x <<","<<abs_yaxis->y <<")\n"
+	   << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y<<")\n"
+	   << "abs_x_axis:(" <<abs_xaxis->x <<","<<abs_xaxis->y <<")"<< endl;
       absswitch=0;
-      turnangle=atan2(yaxis_y - orig_y,yaxis_x - orig_x);
       cout <<"### absswitch OFF ###" << endl;
+      turnangle=atan2(abs_yaxis->y - abs_origin->y,abs_yaxis->x - abs_origin->x);
     }
 }
 

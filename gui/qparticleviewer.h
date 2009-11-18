@@ -76,20 +76,6 @@ class QParticleViewer :  public QWidget{
     unsigned int iterations;
   };
 
-  //coordinate transformation
-  // struct AbsoluteCoordinate{
-  //switch
-  int absswitch;
-  //origin-point
-  double orig_x,orig_y;
-  //x-axis-point
-  double xaxis_x,xaxis_y;
-  //y-axis-point
-  double yaxis_x,yaxis_y;
-  //  };
-  double turnangle;
-
-
   void refreshParameters(); //reads the parameters from the thread
   inline void setGSP( GridSlamProcessorThread* thread){gfs_thread=thread;}
 		
@@ -110,6 +96,7 @@ class QParticleViewer :  public QWidget{
   StartParameters startParameters;
 		
   int writeToFile;
+
   public slots:
   void setMatchingParameters(const MatchingParameters& mp);
   void setStartParameters(const StartParameters& mp);
@@ -152,9 +139,23 @@ class QParticleViewer :  public QWidget{
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseReleaseEvent(QMouseEvent*);
   virtual void mouseMoveEvent(QMouseEvent*);
-  QPoint draggingPos;
+  QPoint clickPos;
   bool dragging;
 		
+  //coordinate transformation
+  //switch
+  int absswitch;
+  //origin-point
+  Point *abs_origin;
+  //x-axis-point
+  Point *abs_xaxis;
+  //y-axis-point
+  Point *abs_yaxis;
+  //abs_origen-abs_yaxis-angle
+  double turnangle;
+
+
+
   //particle plotting
   virtual void keyPressEvent ( QKeyEvent* e );
 		
