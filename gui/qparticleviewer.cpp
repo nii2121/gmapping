@@ -552,3 +552,31 @@ void QParticleViewer::getabsolute(int x,int y)
     }
 }
 
+
+
+/* follows are under constraction*/
+/*
+
+//If getPoint in File or DataBase then load this function 
+double TranformCoordinate(double X,double Y) //or (Point *objectPoint-inDataBase)
+{
+  if(!abs_origin && !turnangle)
+    {
+      cout <<"Please set absolutePoints" <<endl;
+      return;
+    }
+  x=X*tan(turnangle)+abs_origin->x;
+  y=y*tan(turnangle)+abs_origin->y;
+  return Point(x,y);
+}
+
+
+//keyPressEvent
+{
+
+ case Qt::Key_???:fprintf(,w) ; break;
+ case Qt::Key_???:fprintf(,r) ; break;
+ case Qt::Key_???:getMapObjectPosition() ;break;
+}
+
+*/
