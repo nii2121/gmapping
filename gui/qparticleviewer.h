@@ -154,6 +154,17 @@ class QParticleViewer :  public QWidget{
   //abs_origen-abs_yaxis-angle
   double turnangle;
 
+  Point *abs_object;
+  FILE *fp;
+  char *fPoint ;
+  char *s1;
+  //  char *s2 ;
+  // char *s3;
+  float f1;
+  float f2;
+  int ret;
+  char s[100];
+    int draw_x,draw_y;
 
 
   //particle plotting
