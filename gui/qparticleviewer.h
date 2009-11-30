@@ -79,7 +79,13 @@ class QParticleViewer :  public QWidget{
   void refreshParameters(); //reads the parameters from the thread
   inline void setGSP( GridSlamProcessorThread* thread){gfs_thread=thread;}
 		
-		
+  int tester1;
+  int tester2;
+  int tester3;
+  int tester4;
+  int tester5;
+  int showObjectPoint;
+	       
   typedef std::vector<OrientedPoint> OrientedPointVector;
   QParticleViewer( QWidget * parent = 0, const char * name = 0, WFlags f = 0, GridSlamProcessorThread* thread=0 );
   virtual ~QParticleViewer();
@@ -105,6 +111,7 @@ class QParticleViewer :  public QWidget{
   void loadFile(const char *);
   void received( int, int );
   void getabsolute(int,int);
+  void drawObjectPoint();		
 
  signals:
   void neffChanged(double);
@@ -113,7 +120,7 @@ class QParticleViewer :  public QWidget{
   void mapsEntropyChanged(double);
   void mapsIGainChanged(double);
   void valueChanged( int, int );
-
+  void ObjectPoint();
 		
  protected:
   ifstream inputStream;
@@ -130,7 +137,7 @@ class QParticleViewer :  public QWidget{
   virtual void paintEvent ( QPaintEvent *paintevent );
   void drawParticleMove(const OrientedPointVector& start, const OrientedPointVector& end); 
   QPixmap* m_pixmap;
-		
+
   //thread interaction
   GridSlamProcessorThread* gfs_thread;
   GridSlamProcessorThread::EventDeque history;
@@ -164,7 +171,7 @@ class QParticleViewer :  public QWidget{
   float f2;
   int ret;
   char s[100];
-    int draw_x,draw_y;
+  int draw_x,draw_y;
 
 
   //particle plotting

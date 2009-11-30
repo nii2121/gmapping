@@ -88,7 +88,7 @@ int  main (int argc, char ** argv){
   GFSMainWindow* mainWin=new GFSMainWindow(gsp);
   app.setMainWidget(mainWin);
   mainWin->show();
-  gsp->setEventBufferSize(10000);
+  gsp->setEventBufferSize(2500);
   gsp->start();
   mainWin->start(1000);
   return app.exec();
