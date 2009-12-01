@@ -62,16 +62,4 @@ qparticleviewer.o: qparticleviewer.cpp qparticleviewer.h \
   /home/2009/niitomo/project/gmapping-dist/gridfastslam/motionmodel.h \
   /usr/lib/qt-3.3/include/qrangecontrol.h \
   /usr/lib/qt-3.3/include/qframe.h /usr/lib/qt-3.3/include/qwidget.h \
-  /usr/lib/qt-3.3/include/qpoint.h moc_qparticleviewer.cpp \
-  /usr/lib/qt-3.3/include/qmetaobject.h \
-  /usr/lib/qt-3.3/include/qconnection.h \
-  /usr/lib/qt-3.3/include/qapplication.h \
-  /usr/lib/qt-3.3/include/qdesktopwidget.h \
-  /usr/lib/qt-3.3/include/qasciidict.h /usr/lib/qt-3.3/include/qgdict.h \
-  /usr/lib/qt-3.3/include/qtranslator.h \
-  /usr/lib/qt-3.3/include/private/qucomextra_p.h \
-  /usr/lib/qt-3.3/include/private/qucom_p.h \
-  /usr/lib/qt-3.3/include/qstring.h /usr/lib/qt-3.3/include/quuid.h \
-  /usr/lib/qt-3.3/include/qobjectdefs.h \
-  /usr/lib/qt-3.3/include/qsignalslotimp.h \
-  /usr/lib/qt-3.3/include/qptrvector.h /usr/lib/qt-3.3/include/qgvector.h
+  /usr/lib/qt-3.3/include/qpoint.h moc_qparticleviewer.cpp

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** QParticleViewer meta object code from reading C++ file 'qparticleviewer.h'
 **
-** Created: Mon Nov 30 19:52:12 2009
+** Created: Tue Dec 1 20:27:50 2009
 **      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.6   edited Mar 8 17:43 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -115,7 +115,7 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ 0, &static_QUType_int, 0, QUParameter::In },
 	{ 0, &static_QUType_int, 0, QUParameter::In }
     };
-    static const QUMethod signal_5 = {"valueChanged", 2, param_signal_5 };
+    static const QUMethod signal_5 = {"clickedPosition", 2, param_signal_5 };
     static const QUMethod signal_6 = {"ObjectPoint", 0, 0 };
     static const QMetaData signal_tbl[] = {
 	{ "neffChanged(double)", &signal_0, QMetaData::Public },
@@ -123,7 +123,7 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ "trajectoryEntropyChanged(double,double,double)", &signal_2, QMetaData::Public },
 	{ "mapsEntropyChanged(double)", &signal_3, QMetaData::Public },
 	{ "mapsIGainChanged(double)", &signal_4, QMetaData::Public },
-	{ "valueChanged(int,int)", &signal_5, QMetaData::Public },
+	{ "clickedPosition(int,int)", &signal_5, QMetaData::Public },
 	{ "ObjectPoint()", &signal_6, QMetaData::Public }
     };
     metaObj = QMetaObject::new_metaobject(
@@ -197,8 +197,8 @@ void QParticleViewer::mapsIGainChanged( double t0 )
     activate_signal( staticMetaObject()->signalOffset() + 4, t0 );
 }
 
-// SIGNAL valueChanged
-void QParticleViewer::valueChanged( int t0, int t1 )
+// SIGNAL clickedPosition
+void QParticleViewer::clickedPosition( int t0, int t1 )
 {
     if ( signalsBlocked() )
 	return;
@@ -242,7 +242,7 @@ bool QParticleViewer::qt_emit( int _id, QUObject* _o )
     case 2: trajectoryEntropyChanged((double)static_QUType_double.get(_o+1),(double)static_QUType_double.get(_o+2),(double)static_QUType_double.get(_o+3)); break;
     case 3: mapsEntropyChanged((double)static_QUType_double.get(_o+1)); break;
     case 4: mapsIGainChanged((double)static_QUType_double.get(_o+1)); break;
-    case 5: valueChanged((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
+    case 5: clickedPosition((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
     case 6: ObjectPoint(); break;
     default:
 	return QWidget::qt_emit(_id,_o);

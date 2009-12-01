@@ -119,7 +119,7 @@ class QParticleViewer :  public QWidget{
   void trajectoryEntropyChanged(double, double, double);
   void mapsEntropyChanged(double);
   void mapsIGainChanged(double);
-  void valueChanged( int, int );
+  void clickedPosition( int,int );
   void ObjectPoint();
 		
  protected:
