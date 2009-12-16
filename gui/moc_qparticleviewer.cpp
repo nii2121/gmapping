@@ -1,7 +1,7 @@
 /****************************************************************************
 ** QParticleViewer meta object code from reading C++ file 'qparticleviewer.h'
 **
-** Created: Tue Dec 1 20:27:50 2009
+** Created: Wed Dec 9 18:47:08 2009
 **      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.6   edited Mar 8 17:43 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -77,6 +77,13 @@ QMetaObject* QParticleViewer::staticMetaObject()
     };
     static const QUMethod slot_6 = {"getabsolute", 2, param_slot_6 };
     static const QUMethod slot_7 = {"drawObjectPoint", 0, 0 };
+    static const QUParameter param_slot_8[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In },
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod slot_8 = {"getObjectPoints", 2, param_slot_8 };
+    static const QUMethod slot_9 = {"WriteToTempDB", 0, 0 };
+    static const QUMethod slot_10 = {"ReadToTempDB", 0, 0 };
     static const QMetaData slot_tbl[] = {
 	{ "setMatchingParameters(const MatchingParameters&)", &slot_0, QMetaData::Public },
 	{ "setStartParameters(const StartParameters&)", &slot_1, QMetaData::Public },
@@ -85,7 +92,10 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ "loadFile(const char*)", &slot_4, QMetaData::Public },
 	{ "received(int,int)", &slot_5, QMetaData::Public },
 	{ "getabsolute(int,int)", &slot_6, QMetaData::Public },
-	{ "drawObjectPoint()", &slot_7, QMetaData::Public }
+	{ "drawObjectPoint()", &slot_7, QMetaData::Public },
+	{ "getObjectPoints(int,int)", &slot_8, QMetaData::Public },
+	{ "WriteToTempDB()", &slot_9, QMetaData::Public },
+	{ "ReadToTempDB()", &slot_10, QMetaData::Public }
     };
     static const QUParameter param_signal_0[] = {
 	{ 0, &static_QUType_double, 0, QUParameter::In }
@@ -115,21 +125,27 @@ QMetaObject* QParticleViewer::staticMetaObject()
 	{ 0, &static_QUType_int, 0, QUParameter::In },
 	{ 0, &static_QUType_int, 0, QUParameter::In }
     };
-    static const QUMethod signal_5 = {"clickedPosition", 2, param_signal_5 };
-    static const QUMethod signal_6 = {"ObjectPoint", 0, 0 };
+    static const QUMethod signal_5 = {"absclickedPosition", 2, param_signal_5 };
+    static const QUParameter param_signal_6[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In },
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod signal_6 = {"objclickedPosition", 2, param_signal_6 };
+    static const QUMethod signal_7 = {"ObjectPoint", 0, 0 };
     static const QMetaData signal_tbl[] = {
 	{ "neffChanged(double)", &signal_0, QMetaData::Public },
 	{ "poseEntropyChanged(double,double,double)", &signal_1, QMetaData::Public },
 	{ "trajectoryEntropyChanged(double,double,double)", &signal_2, QMetaData::Public },
 	{ "mapsEntropyChanged(double)", &signal_3, QMetaData::Public },
 	{ "mapsIGainChanged(double)", &signal_4, QMetaData::Public },
-	{ "clickedPosition(int,int)", &signal_5, QMetaData::Public },
-	{ "ObjectPoint()", &signal_6, QMetaData::Public }
+	{ "absclickedPosition(int,int)", &signal_5, QMetaData::Public },
+	{ "objclickedPosition(int,int)", &signal_6, QMetaData::Public },
+	{ "ObjectPoint()", &signal_7, QMetaData::Public }
     };
     metaObj = QMetaObject::new_metaobject(
 	"QParticleViewer", parentObject,
-	slot_tbl, 8,
-	signal_tbl, 7,
+	slot_tbl, 11,
+	signal_tbl, 8,
 #ifndef QT_NO_PROPERTIES
 	0, 0,
 	0, 0,
@@ -197,8 +213,8 @@ void QParticleViewer::mapsIGainChanged( double t0 )
     activate_signal( staticMetaObject()->signalOffset() + 4, t0 );
 }
 
-// SIGNAL clickedPosition
-void QParticleViewer::clickedPosition( int t0, int t1 )
+// SIGNAL absclickedPosition
+void QParticleViewer::absclickedPosition( int t0, int t1 )
 {
     if ( signalsBlocked() )
 	return;
@@ -211,10 +227,24 @@ void QParticleViewer::clickedPosition( int t0, int t1 )
     activate_signal( clist, o );
 }
 
+// SIGNAL objclickedPosition
+void QParticleViewer::objclickedPosition( int t0, int t1 )
+{
+    if ( signalsBlocked() )
+	return;
+    QConnectionList *clist = receivers( staticMetaObject()->signalOffset() + 6 );
+    if ( !clist )
+	return;
+    QUObject o[3];
+    static_QUType_int.set(o+1,t0);
+    static_QUType_int.set(o+2,t1);
+    activate_signal( clist, o );
+}
+
 // SIGNAL ObjectPoint
 void QParticleViewer::ObjectPoint()
 {
-    activate_signal( staticMetaObject()->signalOffset() + 6 );
+    activate_signal( staticMetaObject()->signalOffset() + 7 );
 }
 
 bool QParticleViewer::qt_invoke( int _id, QUObject* _o )
@@ -228,6 +258,9 @@ bool QParticleViewer::qt_invoke( int _id, QUObject* _o )
     case 5: received((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
     case 6: getabsolute((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
     case 7: drawObjectPoint(); break;
+    case 8: getObjectPoints((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
+    case 9: WriteToTempDB(); break;
+    case 10: ReadToTempDB(); break;
     default:
 	return QWidget::qt_invoke( _id, _o );
     }
@@ -242,8 +275,9 @@ bool QParticleViewer::qt_emit( int _id, QUObject* _o )
     case 2: trajectoryEntropyChanged((double)static_QUType_double.get(_o+1),(double)static_QUType_double.get(_o+2),(double)static_QUType_double.get(_o+3)); break;
     case 3: mapsEntropyChanged((double)static_QUType_double.get(_o+1)); break;
     case 4: mapsIGainChanged((double)static_QUType_double.get(_o+1)); break;
-    case 5: clickedPosition((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
-    case 6: ObjectPoint(); break;
+    case 5: absclickedPosition((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
+    case 6: objclickedPosition((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
+    case 7: ObjectPoint(); break;
     default:
 	return QWidget::qt_emit(_id,_o);
     }

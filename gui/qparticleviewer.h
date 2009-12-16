@@ -76,6 +76,15 @@ class QParticleViewer :  public QWidget{
     unsigned int iterations;
   };
 
+  struct  ObjectPoints{
+    char name[100];
+    float x ;
+    float y ;
+    int draw_x;
+    int draw_y;
+  };
+
+
   void refreshParameters(); //reads the parameters from the thread
   inline void setGSP( GridSlamProcessorThread* thread){gfs_thread=thread;}
 		
@@ -84,7 +93,6 @@ class QParticleViewer :  public QWidget{
   int tester3;
   int tester4;
   int tester5;
-  int showObjectPoint;
 	       
   typedef std::vector<OrientedPoint> OrientedPointVector;
   QParticleViewer( QWidget * parent = 0, const char * name = 0, WFlags f = 0, GridSlamProcessorThread* thread=0 );
@@ -100,7 +108,7 @@ class QParticleViewer :  public QWidget{
 		
   MatchingParameters matchingParameters;
   StartParameters startParameters;
-		
+	      
   int writeToFile;
 
   public slots:
@@ -112,6 +120,9 @@ class QParticleViewer :  public QWidget{
   void received( int, int );
   void getabsolute(int,int);
   void drawObjectPoint();		
+  void getObjectPoints(int,int);
+  void WriteToTempDB();
+  void ReadToTempDB();
 
  signals:
   void neffChanged(double);
@@ -119,7 +130,8 @@ class QParticleViewer :  public QWidget{
   void trajectoryEntropyChanged(double, double, double);
   void mapsEntropyChanged(double);
   void mapsIGainChanged(double);
-  void clickedPosition( int,int );
+  void absclickedPosition( int,int );
+  void objclickedPosition( int,int );
   void ObjectPoint();
 		
  protected:
@@ -151,7 +163,7 @@ class QParticleViewer :  public QWidget{
 		
   //coordinate transformation
   //switch
-  int absswitch;
+  bool absswitch;
   //origin-point
   Point *abs_origin;
   //x-axis-point
@@ -161,18 +173,19 @@ class QParticleViewer :  public QWidget{
   //abs_origen-abs_yaxis-angle
   double turnangle;
 
-  Point *abs_object;
+  int draworigenx;
+  int draworigeny;
+  int drawyaxisx;
+  int drawyaxisy;
   FILE *fp;
   char *fPoint ;
   char *s1;
-  //  char *s2 ;
-  // char *s3;
   float f1;
   float f2;
-  int ret;
-  char s[100];
-  int draw_x,draw_y;
-
+  int EOFchecker;
+  char str[100];
+  bool objinput;
+  vector<ObjectPoints> object;
 
   //particle plotting
   virtual void keyPressEvent ( QKeyEvent* e );
@@ -186,7 +199,8 @@ class QParticleViewer :  public QWidget{
   // view mode
   bool showPaths;
   bool showBestPath;
-		
+  bool showObjectPoints;
+  bool showLandmark;
   // file plotting
   QParticleViewer::OrientedPointVector m_oldPose, m_newPose;
   unsigned int m_particleSize;

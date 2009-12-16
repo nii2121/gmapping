@@ -44,18 +44,21 @@ QParticleViewer::QParticleViewer( QWidget * parent, const char * name , WFlags f
   showBestPath=1;
   count=0;
   writeToFile=0;
+
+  showObjectPoints=1;
+  showLandmark=0;
+  fPoint = "temporary_DB.csv";
   abs_origin = new Point();
   abs_xaxis = new Point();
   abs_yaxis = new Point();
-  connect(this,SIGNAL(clickedPosition(int,int)),this,SLOT(getabsolute(int,int)));
- 
-  abs_object= new Point();
-  fPoint = "temporary_DB.csv";
-  draw_x=0;
-  draw_y=0;
-  showObjectPoint=0;
+  connect(this,SIGNAL(absclickedPosition(int,int)),this,SLOT(getabsolute(int,int)));
+  connect(this,SIGNAL(objclickedPosition(int,int)),this,SLOT(getObjectPoints(int,int)));
   connect(this,SIGNAL(ObjectPoint()),this,SLOT(drawObjectPoint()));
+
+
   tester1=0;  tester2=0;   tester3=0;  tester4=0;  tester5=0;
+
+
 }
 	  //Destructor
 QParticleViewer::~QParticleViewer()
@@ -94,7 +97,12 @@ void QParticleViewer::mousePressEvent ( QMouseEvent *event )
       if (absswitch)
 	{
 	  clickPos=event->pos();
-	  emit clickedPosition( clickPos.x(), clickPos.y() );
+	  emit absclickedPosition( clickPos.x(), clickPos.y() );
+	}
+      if(objinput)
+	{
+	  clickPos=event->pos();
+	  emit objclickedPosition( clickPos.x(), clickPos.y() );
 	}
     }
 }
@@ -126,64 +134,31 @@ void QParticleViewer::keyPressEvent ( QKeyEvent *e )
     {
     case Qt::Key_B: showBestPath=!showBestPath; break;    ///qnamespace.h
     case Qt::Key_P: showPaths=!showPaths; break;
+    case Qt::Key_O: showObjectPoints=!showObjectPoints ;break;
+    case Qt::Key_L: showLandmark=!showLandmark ;break;
+
     case Qt::Key_Plus: mapscale *=1.25;cout <<mapscale <<endl;  break;
     case Qt::Key_Minus: mapscale/=1.25;cout <<mapscale <<endl;  break;
     case Qt::Key_C: viewCenter=bestParticlePose; break;
+    case Qt::Key_W: WriteToTempDB(); break;
+    case Qt::Key_R: ReadToTempDB(); break;
     case Qt::Key_A: absswitch=!absswitch;cout <<"### absswitch ###" << endl; break;
-    case Qt::Key_Z:
-      *abs_origin=Point(0,0);
-      *abs_xaxis=Point(0,0);
-      *abs_yaxis=Point(0,0);
-      cout << "### reset absolute point ###" << endl; break;
-    case Qt::Key_S: cout << "viewCenter:("<<viewCenter.x<<","<<viewCenter.y<<")\n"
+    case Qt::Key_Z: objinput=!objinput ;break;
+    case Qt::Key_F: m_pixmap->save("test.bmp","BMP");break;
+
+      //debug
+    case Qt::Key_1: viewCenter=Point(0,0);  update();break;
+    case Qt::Key_2: cout <<"arctan:"<<turnangle<<endl; break;
+
+    case Qt::Key_3: cout << "viewCenter:("<<viewCenter.x<<","<<viewCenter.y<<")\n"
 			 << "mapscale  :("<<mapscale <<")\n"
 			 << "m_pixmap  :("<<m_pixmap->size().width()<<","<<m_pixmap->size().height()<<")\n"<<endl;break;
-    case Qt::Key_X:
-      viewCenter=*abs_origin;
-      update();break;
-    case Qt::Key_E:
-      viewCenter=Point(0,0);
-      update();break;
-    case Qt::Key_D:
-      cout <<"arctan:"<<turnangle<<endl;break;
-    case Qt::Key_W:
-      fp = fopen( fPoint, "w" );
-      if( fp == NULL )      
-	{
-	  cout << fPoint <<" ファイルが開けません" <<endl;
-	  break;
-	}
-      *abs_object=Point(cos(-turnangle)*(abs_object->x - abs_origin->x) -sin(-turnangle)*(abs_object->y - abs_origin->y),
-			sin(-turnangle)*(abs_object->x - abs_origin->x) +cos(-turnangle)*(abs_object->y - abs_origin->y));
-      cout << "abs_object:(" <<abs_object->x<<","<<abs_object->y <<")"<<endl;
-      fprintf( fp, "%s,%f,%f\n", s1, abs_object->x,abs_object->y );
-      fclose( fp );
-      cout << fPoint << "ファイル書き込みが終わりました" << endl;
-      break;
-    case Qt::Key_R:
-      fp = fopen( fPoint, "r" );
-      if( fp == NULL )
-	{
-	  cout << fPoint << " ファイルが開けません" << endl;
-	  break;
-	}
-      //    while( ( ret = fscanf( fp, "%[^,],%f,%f", s, &abs_object->x, &abs_object->y ) ) != EOF )
-      fscanf( fp, "%[^,],%f,%f", s, &f1, &f2 );
-      fclose( fp );
-      *abs_object=Point(f1,f2);
-      f1=cos(turnangle)*(abs_object->x) -sin(turnangle)*(abs_object->y)+abs_origin->x;
-      f2=sin(turnangle)*(abs_object->x) +cos(turnangle)*(abs_object->y)+abs_origin->y;
-      cout <<"object:("<<f1<<"," <<f2<<")"<<endl;
-      *abs_object=Point(f1,f2);
-      cout << s <<":("<<  abs_object->x <<","<< abs_object->y <<")"<< endl;
-      break;
- 
-    case Qt::Key_L: showObjectPoint=!showObjectPoint ;break;
-    case Qt::Key_F: m_pixmap->save("test.bmp","BMP");break;
-    case Qt::Key_T:
+    case Qt::Key_4: viewCenter=*abs_origin; update();break;
+    case Qt::Key_5:
       cout <<" #tester1:"<<tester1 <<"\n #tester2:"<<tester2<<"\n #tester3:"<<tester3<<"\n #tester4:"<<tester4<<"\n #tester5:"<<tester5<<endl;
-      tester1=0;  tester2=0;   tester3=0;  tester4=0;  tester5=0;
-      break;
+      tester1=0;  tester2=0;   tester3=0;  tester4=0;  tester5=0; break;
+
+
     default:;
     }
 }
@@ -332,158 +307,173 @@ void QParticleViewer::drawMap(const ScanMatcherMap& map)
 	}
       }    
 }
-  void QParticleViewer::drawFromMemory()
-  {
-    if (! gfs_thread)
-      return;
-    m_pixmap->fill(Qt::white);
-    GridSlamProcessorThread::EventDeque events=gfs_thread->getEvents();
-    for (GridSlamProcessorThread::EventDeque::const_iterator it=events.begin(); it!=events.end();it++)
-      {
-	GridSlamProcessorThread::MapEvent* mapEvent= dynamic_cast<GridSlamProcessorThread::MapEvent*>(*it);
-	if (mapEvent)
-	  {
-	    //cout << "Map: bestIdx=" << mapEvent->index <<endl;
-	    if (bestMap)
-	      delete bestMap;
-	    else 
-	      {
+void QParticleViewer::drawFromMemory()
+{
+  if (! gfs_thread)
+    return;
+  m_pixmap->fill(Qt::white);
+  GridSlamProcessorThread::EventDeque events=gfs_thread->getEvents();
+  for (GridSlamProcessorThread::EventDeque::const_iterator it=events.begin(); it!=events.end();it++)
+    {
+      GridSlamProcessorThread::MapEvent* mapEvent= dynamic_cast<GridSlamProcessorThread::MapEvent*>(*it);
+      if (mapEvent)
+	{
+	  //cout << "Map: bestIdx=" << mapEvent->index <<endl;
+	  if (bestMap)
+	    delete bestMap;
+	  else 
+	    {
 				
-	      }
-	    bestMap=mapEvent->pmap;
-	    mapEvent->pmap=0;
-	    bestParticlePose=mapEvent->pose;
-	    delete mapEvent;
-	  }else
-	  {
-	    GridSlamProcessorThread::DoneEvent* doneEvent= dynamic_cast<GridSlamProcessorThread::DoneEvent*>(*it);
-	    if (doneEvent)
-	      {
-		gfs_thread->stop();
-		delete doneEvent;
-	      } else
-	      history.push_back(*it);
-	  }	
+	    }
+	  bestMap=mapEvent->pmap;
+	  mapEvent->pmap=0;
+	  bestParticlePose=mapEvent->pose;
+	  delete mapEvent;
+	}else
+	{
+	  GridSlamProcessorThread::DoneEvent* doneEvent= dynamic_cast<GridSlamProcessorThread::DoneEvent*>(*it);
+	  if (doneEvent)
+	    {
+	      gfs_thread->stop();
+	      delete doneEvent;
+	    } else
+	    history.push_back(*it);
+	}	
 			
-      }
-    if (bestMap)
-      drawMap(*bestMap);
+    }
+  if (bestMap)
+    drawMap(*bestMap);
 	
-    unsigned int particleSize=0;
-    std::vector<OrientedPoint> oldPose, newPose;
-    vector<unsigned int> indexes;
+  unsigned int particleSize=0;
+  std::vector<OrientedPoint> oldPose, newPose;
+  vector<unsigned int> indexes;
 	
-    GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin();
-    while (!particleSize && it!=history.rend())
-      {
-	GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
-	GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
-	if (move)
-	  particleSize=move->hypotheses.size();
-	if (resample)
-	  particleSize=resample->indexes.size();
-	it++;
-      }
+  GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin();
+  while (!particleSize && it!=history.rend())
+    {
+      GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
+      GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
+      if (move)
+	particleSize=move->hypotheses.size();
+      if (resample)
+	particleSize=resample->indexes.size();
+      it++;
+    }
 	
-    //check for the best index
-    double wmax=-1e2000;
-    unsigned int bestIdx=0;
-    bool emitted=false;
-    for (unsigned int i=0; i<particleSize; i++)
+  //check for the best index
+  double wmax=-1e2000;
+  unsigned int bestIdx=0;
+  bool emitted=false;
+  for (unsigned int i=0; i<particleSize; i++)
+    {
+      unsigned int currentIndex=i;
+      bool done=false;
+      for(GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin(); it!=history.rend()&& !done; it++)
+	{
+	  GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
+	  if (move && move->scanmatched)
+	    {
+	      double cw=move->weightSums[currentIndex];
+	      if (cw>wmax)
+		{
+		  wmax=cw;
+		  bestIdx=currentIndex;
+		} 
+	      done=true;
+	      if (! emitted)
+		{
+		  emit neffChanged(move->neff/particleSize);
+		  emitted=true;
+		}
+	    }
+	  GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
+	  if (resample)
+	    {
+	      currentIndex=resample->indexes[currentIndex];
+	    }
+	}
+    }
+  //cout << "bestIdx=" << bestIdx << endl;
+  QPainter painter(m_pixmap);
+  emit ObjectPoint();
+  if (showObjectPoints)    
+    for ( int i = 0; i < (int)object.size(); ++i )
       {
-	unsigned int currentIndex=i;
-	bool done=false;
-	for(GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin(); it!=history.rend()&& !done; it++)
-	  {
-	    GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
-	    if (move && move->scanmatched)
-	      {
-		double cw=move->weightSums[currentIndex];
-		if (cw>wmax)
-		  {
-		    wmax=cw;
-		    bestIdx=currentIndex;
-		  } 
-		done=true;
-		if (! emitted)
-		  {
-		    emit neffChanged(move->neff/particleSize);
-		    emitted=true;
-		  }
-	      }
-	    GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
-	    if (resample)
-	      {
-		currentIndex=resample->indexes[currentIndex];
-	      }
-	  }
+	painter.setPen(Qt::magenta);
+	painter.drawEllipse(object[i].draw_x,object[i].draw_y,5,5);
       }
-    //cout << "bestIdx=" << bestIdx << endl;
-    QPainter painter(m_pixmap);
-    emit ObjectPoint();
-    if (showObjectPoint)
-    
-      {
-	painter.setPen(Qt::blue);
-	painter.drawEllipse(draw_x,draw_y,5,5);
-      }
-    for (unsigned int i=0; i<particleSize+1; i++)
-      {
-	painter.setPen(Qt::yellow);
-	unsigned int currentIndex=i;
-	if (i==particleSize && showBestPath)
-	  {
-	    currentIndex=bestIdx;
-	    painter.setPen(Qt::red);
-	  }
-	bool first=true;
-	OrientedPoint pnew;
-	for(GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin(); it!=history.rend(); it++)
-	  {
-	    GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
-	    if (move)
+  if(showLandmark)
+    {
+      painter.setPen(Qt::green);
+      draworigenx = (int)(  ( abs_origin->x - viewCenter.x ) * mapscale + ( m_pixmap->size().width() ) /2);
+      draworigeny = (int)( -( abs_origin->y - viewCenter.y ) * mapscale + ( m_pixmap->size().height() ) /2);
+      drawyaxisx  = (int)(  ( abs_yaxis->x  - viewCenter.x ) * mapscale + ( m_pixmap->size().width() ) /2);
+      drawyaxisy  = (int)( -( abs_yaxis->y  - viewCenter.y ) * mapscale + ( m_pixmap->size().height() ) /2);
+      painter.drawLine ( draworigenx,draworigeny, drawyaxisx, drawyaxisy ) ;
+      /*      
+	      for ( int i = 0; i+1 < (int)object.size(); ++i )
 	      {
-		OrientedPoint pold=move->hypotheses[currentIndex];
-		IntPoint p0=map2pic(pold)+IntPoint(m_pixmap->width()/2,m_pixmap->height()/2);
-		IntPoint p1=map2pic(pnew)+IntPoint(m_pixmap->width()/2,m_pixmap->height()/2);
-		if (first)
-		  {
-		    painter.drawPoint(p0.x, p0.y);
-		  }
-		else 
-		  {
-		    painter.drawLine(p0.x, p0.y, p1.x, p1.y);
-		  }
-		first=false;
-		if (!((showPaths&&i<particleSize ) || (showBestPath&&i==particleSize) ) )
-		  break;
-		pnew=pold;
+	      painter.drawLine (object[i].draw_x,object[i].draw_y,object[i+1].draw_x,object[i+1].draw_y);
 	      }
-	    GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
-	    if (resample && ! first)
-	      {
-		currentIndex=resample->indexes[currentIndex];
-	      }
-	  }
-      }
-    if (writeToFile && bestMap)
-      {
-	if (! (count%writeToFile) )
-	  {
-	    char name[100];
-	    sprintf(name,"dump-%05d.png", count/writeToFile);
-	    cout << " Writing " << name <<" ..." << flush;
-	    QImage image=m_pixmap->convertToImage();
-	    bool rv=image.save(name,"PNG");
-	    if (rv)
-	      cout << " Done";
-	    else
-	      cout << " ERROR";
-	    cout << endl;
-	  }
-	count++;
-      }
-  }
+      */
+    }
+  for (unsigned int i=0; i<particleSize+1; i++)
+    {
+      painter.setPen(Qt::yellow);
+      unsigned int currentIndex=i;
+      if (i==particleSize && showBestPath)
+	{
+	  currentIndex=bestIdx;
+	  painter.setPen(Qt::red);
+	}
+      bool first=true;
+      OrientedPoint pnew;
+      for(GridSlamProcessorThread::EventDeque::reverse_iterator it=history.rbegin(); it!=history.rend(); it++)
+	{
+	  GridSlamProcessorThread::ParticleMoveEvent* move= dynamic_cast<GridSlamProcessorThread::ParticleMoveEvent*>(*it);
+	  if (move)
+	    {
+	      OrientedPoint pold=move->hypotheses[currentIndex];
+	      IntPoint p0=map2pic(pold)+IntPoint(m_pixmap->width()/2,m_pixmap->height()/2);
+	      IntPoint p1=map2pic(pnew)+IntPoint(m_pixmap->width()/2,m_pixmap->height()/2);
+	      if (first)
+		{
+		  painter.drawPoint(p0.x, p0.y);
+		}
+	      else 
+		{
+		  painter.drawLine(p0.x, p0.y, p1.x, p1.y);
+		}
+	      first=false;
+	      if (!((showPaths&&i<particleSize ) || (showBestPath&&i==particleSize) ) )
+		break;
+	      pnew=pold;
+	    }
+	  GridSlamProcessorThread::ResampleEvent* resample= dynamic_cast<GridSlamProcessorThread::ResampleEvent*>(*it);
+	  if (resample && ! first)
+	    {
+	      currentIndex=resample->indexes[currentIndex];
+	    }
+	}
+    }
+  if (writeToFile && bestMap)
+    {
+      if (! (count%writeToFile) )
+	{
+	  char name[100];
+	  sprintf(name,"dump-%05d.png", count/writeToFile);
+	  cout << " Writing " << name <<" ..." << flush;
+	  QImage image=m_pixmap->convertToImage();
+	  bool rv=image.save(name,"PNG");
+	  if (rv)
+	    cout << " Done";
+	  else
+	    cout << " ERROR";
+	  cout << endl;
+	}
+      count++;
+    }
+}
   void QParticleViewer::timerEvent(QTimerEvent * te) 
   {
     if (te->timerId()==timer) 
@@ -592,60 +582,132 @@ void QParticleViewer::drawMap(const ScanMatcherMap& map)
   {
     debug( "New value selected: (%d, %d)\n", x, y );
   }
-  void QParticleViewer::getabsolute(int x,int y)
-  {
-    if(!abs_yaxis->x && !abs_yaxis->y)
-    
-      { 
-	*abs_yaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
-			 viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
-	cout << "y_axis:(" <<abs_yaxis->x<<","<<abs_yaxis->y<<")"<< endl;
-      }
-    else if(!abs_origin->x && !abs_origin->y)
-    
-      {
-	*abs_origin=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
-			  viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
-	cout << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y <<")"<<endl;
-      }
-    else if(!abs_xaxis->x && !abs_xaxis->y)
-    
-      {
-	*abs_xaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
-			 viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
-	cout << "x_axis:(" <<abs_xaxis->x<<","<<abs_xaxis->y<<")"<<endl;
-	cout << "#### got 3 points ####" <<endl;
-	cout << "abs_y_axis:(" <<abs_yaxis->x <<","<<abs_yaxis->y <<")\n"
-	     << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y<<")\n"
-	     << "abs_x_axis:(" <<abs_xaxis->x <<","<<abs_xaxis->y <<")"<< endl;
-	turnangle=atan2(abs_yaxis->y - abs_origin->y,abs_yaxis->x - abs_origin->x);
-      } 
-    /*  else if(absswitch)
-      
-    {
-    absswitch=0;
-    cout <<"### absswitch OFF ###" << endl;
+void QParticleViewer::getabsolute(int x,int y)
+{
+  if(!abs_yaxis->x && !abs_yaxis->y)
+    { 
+      *abs_yaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+		       viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      cout << "y_axis:(" <<abs_yaxis->x<<","<<abs_yaxis->y<<")"<< endl;
     }
-    */
-    else 
-    
-      {
-	cout <<"clickPos:("<<x<<","<<y<<")"<<endl;
-	*abs_object=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
-			  viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
-	cout << "abs_object:(" <<abs_object->x<<","<<abs_object->y <<")"<<endl;
-      }  
-  }
-  void QParticleViewer::drawObjectPoint()
-  {
-    draw_x=  ( abs_object->x - viewCenter.x ) * mapscale + ( m_pixmap->size().width() ) /2;
-    draw_y= -( abs_object->y - viewCenter.y ) * mapscale + ( m_pixmap->size().width() ) /2;
-    cout <<"drawQPoint:("<<draw_x<<","<<draw_y<<")"<<endl;
-  }
+  else if(!abs_origin->x && !abs_origin->y)
+    {
+      *abs_origin=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+			viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      cout << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y <<")"<<endl;
+    }
+  else if(!abs_xaxis->x && !abs_xaxis->y)
+    {
+      *abs_xaxis=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+		       viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+      cout << "x_axis:(" <<abs_xaxis->x<<","<<abs_xaxis->y<<")"<<endl;
+      cout << "#### got 3 points ####" <<endl;
+      cout << "abs_y_axis:(" <<abs_yaxis->x <<","<<abs_yaxis->y <<")\n"
+	   << "abs_origin:(" <<abs_origin->x<<","<<abs_origin->y<<")\n"
+	   << "abs_x_axis:(" <<abs_xaxis->x <<","<<abs_xaxis->y <<")"<< endl;
 
+      turnangle=atan2(abs_yaxis->y - abs_origin->y,abs_yaxis->x - abs_origin->x);
+      showLandmark=1;
+      //スイッチをOFF
+      absswitch=0;
+      cout <<"### absswitch OFF ###" << endl;
+      ReadToTempDB();
+    } 
+  else
+    {
+      //ランドマークのリセット
+      *abs_origin=Point(0,0);
+      *abs_xaxis=Point(0,0);
+      *abs_yaxis=Point(0,0);
+      showLandmark=0;
+      cout << "### reset absolute point ###" << endl;
+      //スイッチをOFF
+      absswitch=0;
+      cout <<"### absswitch OFF ###" << endl;
+    }
+  /*
+    else 
+    {
+    cout <<"clickPos:("<<x<<","<<y<<")"<<endl;
+    *abs_object=Point(viewCenter.x + (x-((m_pixmap->size().width())/2))/mapscale,
+    viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+    cout << "abs_object:(" <<abs_object->x<<","<<abs_object->y <<")"<<endl;
+    }  
+  */
+}
+
+  //構造体へ値を入力
+void QParticleViewer::getObjectPoints(int x,int y)
+{
+  ObjectPoints temp;
+  sprintf(temp.name,"Object%d",object.size()+1);
+  temp.x = static_cast<float>(viewCenter.x + (x-((m_pixmap->size().width() )/2))/mapscale);
+  temp.y = static_cast<float>(viewCenter.y - (y-((m_pixmap->size().height())/2))/mapscale);
+  object.push_back(temp);
+ 
+  ///////////////////////////
+  //構造体の内容を表示
+  for ( int i = 0; i < (int)object.size(); ++i )
+    {
+      cout <<object[i].name<<" :("<< object[i].x << ',' << object[i].y <<")"<< endl;
+    }
+  ////////////////////////////
+}
+
+
+void QParticleViewer::drawObjectPoint()
+{
+  for ( int i = 0; i < (int)object.size(); ++i )
+    {
+      object[i].draw_x=(int)(  ( object[i].x - viewCenter.x ) * mapscale + ( m_pixmap->size().width() ) /2);
+      object[i].draw_y=(int)( -( object[i].y - viewCenter.y ) * mapscale + ( m_pixmap->size().height()) /2);
+      //   cout <<object[i].name<<" :("<< object[i].draw_x << ',' << object[i].draw_y <<")"<< endl;
+    }
+}
 
 
 
   /* follows are under constraction*/
   /*
    */
+void QParticleViewer::WriteToTempDB()
+{
+  fp = fopen( fPoint, "w" );
+  if( fp == NULL )      
+    {cout << fPoint <<" ファイルが開けません" <<endl; return;}
+
+  for ( int i = 0; i < (int)object.size(); ++i )
+    {
+      f1=cos(-turnangle)*(object[i].x - abs_origin->x) -sin(-turnangle)*(object[i].y - abs_origin->y);
+      f2=sin(-turnangle)*(object[i].x - abs_origin->x) +cos(-turnangle)*(object[i].y - abs_origin->y);
+      fprintf( fp, "%s,%f,%f", object[i].name, f1,f2 );
+    }
+  cout << fPoint << "ファイル書き込みが終わりました\n" << endl;
+  fclose( fp );
+}
+
+void QParticleViewer::ReadToTempDB()
+{
+  object.clear();
+  cout << "ファイルを読み込みます" << endl;
+  fp = fopen(fPoint, "r" );
+  if( fp == NULL )
+    { cout << fPoint << " ファイルが開けません" << endl;return;}
+
+  while( ( EOFchecker = fscanf( fp, "%[^,],%f,%f", str, &f1, &f2 ) ) != EOF )
+    {
+      ObjectPoints temp;
+      sprintf(temp.name,"%s",str);
+      temp.x=cos(turnangle)*(f1) -sin(turnangle)*(f2)+abs_origin->x;
+      temp.y=sin(turnangle)*(f1) +cos(turnangle)*(f2)+abs_origin->y;
+      object.push_back(temp);
+    }
+  cout << fPoint << "ファイル読み込みが終わりました\n" << endl;
+  fclose( fp );
+
+  for ( int i = 0; i < (int)object.size(); ++i )
+    {
+      cout <<object[i].name<<" :("<< object[i].x << ',' << object[i].y <<")"<< endl;
+    }
+}
+
